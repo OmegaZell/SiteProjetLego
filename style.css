@@ -1,0 +1,131 @@
+header
+{
+
+  width: 100%;
+  max-width: 1980px;
+  min-width: 700px;
+  background-color: grey;
+  height: 150px; 
+
+}
+
+
+#Navigateur
+{
+
+	display: flex;
+	text-align: center;
+
+}
+
+
+.Navi
+{
+
+	width: 80%;
+	font-size : 1.7em;
+  position:relative;
+  overflow:hidden;
+  text-align: center;
+
+}
+
+
+.Navi a
+{
+   
+    text-decoration: none; 
+    color: white;
+    font-weight: bold;
+
+}
+
+
+.Navi a:hover
+{
+
+    color: #1E90FF;
+    outline: none;
+    font-size:1.2em;
+
+
+}
+
+
+#Navigateur .Navi
+{
+
+    margin-left: auto;
+    margin-right: auto;
+    display:block;
+    height: 50%;
+    margin-top: 4%;
+
+}
+
+
+.titre
+{
+
+	text-align: center;
+
+}
+
+
+.logo
+{
+
+	float: left;
+
+}
+
+
+/*footer
+{
+  width: 100%;
+  max-width: 1980px;
+  min-width: 700px;
+  background-color: grey;
+  height: 139px;
+  bottom: 0;
+  position: absolute
+}*/
+
+
+/*ul
+{
+  list-style: none;
+}*/
+
+
+.sommaire
+{
+  border : solid;
+  width: 50%;
+  border-radius: 10px;
+  border-color: black;
+  margin: auto;
+  margin-top: 15px;
+  font-size: 1.8em;
+  background-color: #DCDCDC; 
+}
+
+.sommaire a : hover
+{
+  color: red;
+  outline: none;
+}
+
+.sommaire a
+{
+    text-decoration: none; 
+    font-weight: bold;
+    color: black;
+    text-align: center;
+}
+
+
+#Apresentation 
+{
+  font-size: 1.4em;
+}
