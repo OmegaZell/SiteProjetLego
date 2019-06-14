@@ -1,0 +1,212 @@
+<!DOCTYPE html> <!-- indique que le document est en html -->
+<html> <!-- début de la page en HTML -> toujours en premier/dernier -->
+	<head>
+		<meta charset="utf-8" /> <!-- format encodage du texte -->
+		<link rel="stylesheet" href="style.css" />
+		<title>Les programmes</title> <!-- Titre affiche en haut et dans les recherches google -->
+		<link rel="icon" type="image/png" href="geii.png" />
+	</head>
+	
+	<body>
+		<header>
+			<img class= "logo" src="iut.png"/>
+
+
+			<nav id="Navigateur">
+				<div class="Navi"> <a href="home.html" title="Accueil"> Accueil </a> </div>
+				<div class="Navi"> <a href="equipe.html" title="L'équipe"> L'Equipe </a> </div>
+				<div class="Navi"> <a href="programmes.html" title="Programmes"> Programmes </a> </div>
+				<div class="Navi"> <a href="medias.html" title="Medias"> Médias </a></p> </div>
+			</nav>	
+		</header>	
+
+		<section>
+			<div class="dl">
+	<a href="https://cdn.discordapp.com/attachments/580011541894529059/588776575248629761/SAUCE_MARTE.c">Télécharger le fichier</a><br>
+	<div class = "programme1">
+	//Declaration des emplacements moteurs et capterus--------------------------------------------------------------<br>
+	#pragma config(Sensor, S1,     Touche,         sensorEV3_Touch)<br>
+	#pragma config(Sensor, S2,     Color,          sensorEV3_Color, modeEV3Color_Color)<br>
+	#pragma config(Sensor, S3,     Gyro,           sensorEV3_Gyro)<br>
+	#pragma config(Sensor, S4,     tete,           sensorEV3_Ultrasonic)<br>
+	#pragma config(Motor,  motorA,          motD,          tmotorEV3_Large, PIDControl, reversed, encoder)<br>
+	#pragma config(Motor,  motorB,          motT,          tmotorEV3_Medium, PIDControl, reversed, encoder)<br>
+	#pragma config(Motor,  motorD,          motG,          tmotorEV3_Large, PIDControl, reversed, encoder)<br>
+<br>
+	//Declaration de sous fonctions---------------------------------------------------------------------------------<br>
+	void TourTeteG (void);<br>
+	void TourTeteD (void);<br>
+	void TournerG (void);<br>
+	void TournerD (void);<br>
+<br>
+	//Programme principal-------------------------------------------------------------------------------------------<br>
+	task main()<br>
+	{<br>
+		int etat=0, dist=0, distD=0, distG=0;<br>
+<br>
+		while(true)<br>
+		{<br>
+			//Etats de fonctionnement du robot<br>
+			switch (etat)<br>
+	 		{<br>
+<br>
+			case 0:	//Demarrage du robot par appui sur capteur de contact<br>
+<br>
+			motor[motG] = 0;<br>
+			motor[motD] = 0;<br>
+			if (getTouchValue(Touche)==1)<br>
+				etat=1;<br>
+<br>
+			break;<br>
+<br>
+	 		case 1: //Avancement jusqu'a detection de mur<br>
+<br>
+				//Quelle couleur est au sol ?<br>
+				if (getColorName(S2) == 5) //Couleur Rouge<br>
+					etat=4; //Desamorcage du piege<br>
+				else if (getColorName(S2) == 7) //Couleur Jaune<br>
+					etat=3; //Cri de la victoire<br>
+<br>
+	 			dist = SensorValue[tete]; // Prise de la distance avec le mur devant<br>
+<br>
+				if (dist > 20) // Avance ya pas de mur (30cm de detect) - marche des moteurs<br>
+				{<br>
+					motor[motG] = 50;<br>
+					motor[motD] = 50;<br>
+				}<br>
+				else // Ya un mur - arret des moteurs<br>
+				{<br>
+					playSoundFile("Uh-oh.rsf");<br>
+					motor[motG] = 0;<br>
+					motor[motD] = 0;<br>
+					etat=2; // Passage a l'etat ou il detecte les mur sur les cotés<br>
+				}<br>
+<br>
+				break;<br>
+<br>
+			case 2: //Detection des murs sur les cotes avec tournage du robot dans le bon sens<br>
+<br>
+				playSoundFile("Sonar.rsf");<br>
+<br>
+				TourTeteD(); //Tourne la tete a droite<br>
+					sleep(100);<br>
+					distD = SensorValue[tete]; //Capte la distance du mur a droite<br>
+				TourTeteG(); TourTeteG(); //Tourne la tete a gauche<br>
+					sleep(100);<br>
+					distG = SensorValue[tete]; //Capte la distance du mur a droite<br>
+				TourTeteD(); //Remise en position initiale<br>
+					sleep(100);<br>
+<br>
+				if (distD < 50 && distG < 50) //Condition si il est bloqué, il fait demi tour<br>
+				{<br>
+					TournerG(); TournerG();<br>
+				}<br>
+				else if (distD > 50 && distG < 50) //Il y a un mur a droite, il tourne a gauche<br>
+					TournerG();<br>
+				else if (distD < 50 && distG > 50) //Il y a un mur a gauche, il tourne a droite<br>
+					TournerD();<br>
+				else if (distD > 50 && distG > 50) //Il n'y a aucun mur, il tourne a droite<br>
+					TournerD();<br>
+<br>
+				etat=1; // Reprise de la marche avant avec detection du mur devant<br>
+<br>
+				break;<br>
+<br>
+			case 3: //Cri de la victoire<br>
+<br>
+				playSoundFile("Confirm.rsf");<br>
+<br>
+				motor[motG] = 60;<br>
+				motor[motD] = -60;<br>
+<br>
+				sleep(2200);<br>
+<br>
+				motor[motG] = 0;<br>
+				motor[motD] = 0;<br>
+<br>
+				playSoundFile("T-rex roar.rsf");<br>
+				TourTeteD();<br>
+				TourTeteG(); TourTeteG();<br>
+				TourTeteD();<br>
+<br>
+<br>
+				etat=0; //Repasse à l'etat d'initialisation car il a fini le labyrinthe et est pret a repartir<br>
+<br>
+				break;<br>
+<br>
+			case 4: //Desamorcage du piege<br>
+<br>
+				motor[motG] = 0;<br>
+				motor[motD] = 0;<br>
+				playSoundFile("Ouch.rsf");<br>
+				sleep(1000); //Faire comprendre qu'il a vu le piege<br>
+<br>
+				//Tant qu'il n'appuie pas sur le mur il recule<br>
+				motor [motG] = -50;<br>
+				motor [motD] = -50;<br>
+				while (!SensorValue[Touche]){}<br>
+<br>
+				//Desactivation du piege reussie !<br>
+				playSoundFile("Bravo.rsf");<br>
+				motor[motG] = 0;<br>
+				motor[motD] = 0;<br>
+				TourTeteD(); TourTeteG(); TourTeteG(); TourTeteD();<br>
+<br>
+				etat=1; // Repasse dans l'etat initial ou il avance et detecte<br>
+<br>
+				break;<br>
+			}<br>
+<br>
+		}<br>
+	}<br>
+<br>
+<br>
+	//Sous-Programmes----------------------------------------------------------------------------------------------<br>
+<br>
+	//Tourne la tete a gauche<br>
+	void TourTeteG (void)<br>
+	{<br>
+		motor[motT] = 30;<br>
+		sleep(270);<br>
+		motor[motT] = 0;<br>
+	}<br>
+<br>
+	//Tourne la tete a droite<br>
+	void TourTeteD (void)<br>
+	{<br>
+		motor[motT] = -30;<br>
+		sleep(270);<br>
+		motor[motT] = 0;<br>
+	}<br>
+<br>
+	//Tourne le robot a gauche<br>
+	void TournerG (void)<br>
+	{<br>
+		motor[motG] = 30;<br>
+		motor[motD] = -30;<br>
+		wait1Msec(1058);<br>
+		motor[motG] = 0;<br>
+		motor[motD] = 0;<br>
+<br>
+	}<br>
+<br>
+	//Tourne le robot a gauche<br>
+	void TournerD (void)<br>
+	{<br>
+		motor[motG] = -30;<br>
+		motor[motD] = 30;<br>
+		wait1Msec(1080);<br>
+		motor[motG] = 0;<br>
+		motor[motD] = 0;<br>
+	}<br>
+
+
+			</div>
+		</div>
+		</section>
+
+
+
+
+	</body>
+</html>	
